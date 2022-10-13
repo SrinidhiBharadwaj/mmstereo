@@ -27,6 +27,7 @@ if __name__ == "__main__":
     parser.add_argument("--print_config", action="store_true")
     parser.add_argument("--scratch", action="store_true")
     parser.add_argument("--override", type=str, nargs="+")
+    parser.add_argument("--restore", type=str)
     args = parser.parse_args()
 
     if args.override is not None and len(args.override) > 0:
@@ -44,7 +45,11 @@ if __name__ == "__main__":
     # Mixed precision training uses 16-bit precision floats, otherwise use 32-bit floats.
     precision = 16 if hparams.use_amp else 32
 
-    stereo_model = StereoModel(hparams)
+    if args.restore is None:
+        stereo_model = StereoModel(hparams)
+    else:
+        stereo_model = StereoModel.load_from_checkpoint(args.restore)
+
     data_module = StereoDataModule(hparams.data)
 
     loggers, root_dir, checkpoint_dir = get_loggers(hparams)
