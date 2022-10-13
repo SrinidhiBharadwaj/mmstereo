@@ -44,10 +44,10 @@ def fix_module(module):
             module._modules[child_module_name] = ExportableMatchability()
         elif isinstance(child_module, SoftArgmin):
             module._modules[child_module_name] = ExportableSoftArgmin()
-        elif isinstance(child_module, nn.Flatten):
-            start_dim = int(child_module.start_dim)
-            end_dim = int(child_module.end_dim)
-            module._modules[child_module_name] = ExportableFlatten(start_dim, end_dim)
+        # elif isinstance(child_module, nn.Flatten):
+        #     start_dim = int(child_module.start_dim)
+        #     end_dim = int(child_module.end_dim)
+        #     module._modules[child_module_name] = ExportableFlatten(start_dim, end_dim)
         elif len(list(child_module.children())) > 0:
             fix_module(child_module)
 

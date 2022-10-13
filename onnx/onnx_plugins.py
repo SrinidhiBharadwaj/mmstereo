@@ -10,16 +10,31 @@ import torch.nn as nn
 from layers.cost_volume import cost_volume
 from layers.matchability import matchability
 from layers.soft_argmin import soft_argmin
+from torch.onnx.symbolic_helper import _get_tensor_sizes
 
 
 @torch.autograd.function.traceable
 class ExportableCostVolumeFunction(torch.autograd.Function):
+
     @staticmethod
     def symbolic(g, left, right, num_disparities, is_right):
         assert not is_right
         serialized_data = struct.pack("<iiiii", num_disparities, 0, 0, 0, 0)
-        return g.op("trt::TRT_PluginV2", left, right, version_s="0.0.1", namespace_s="", data_s=serialized_data,
-                    name_s="CrossCorrelationCostVolume")
+        op = g.op("mmstereo::CostVolume",
+                  left,
+                  right,
+                  version_s="0.0.1",
+                  namespace_s="",
+                  data_s=serialized_data,
+                  name_s="CrossCorrelationCostVolume")
+
+        sizes = _get_tensor_sizes(left)
+        if sizes is not None and sizes[1] is not None:
+            N, C, H, W = sizes
+            out_type = left.type().with_sizes([N, C, num_disparities, H, W])
+            op.setType(out_type)
+
+        return op
 
     @staticmethod
     def forward(ctx, left, right, num_disparities, is_right):
@@ -34,14 +49,28 @@ class ExportableCostVolume(nn.Module):
         self.is_right = is_right
 
     def forward(self, left, right):
-        return ExportableCostVolumeFunction.apply(left, right, self.num_disparities, self.is_right)
+        return ExportableCostVolumeFunction.apply(left, right,
+                                                  self.num_disparities,
+                                                  self.is_right)
 
 
 @torch.autograd.function.traceable
 class ExportableMatchabilityFunction(torch.autograd.Function):
+
     @staticmethod
     def symbolic(g, input):
-        return g.op("trt::TRT_PluginV2", input, version_s="0.0.1", namespace_s="", data_s="", name_s="Matchability")
+        op = g.op("mmstereo::Matchability",
+                  input,
+                  version_s="0.0.1",
+                  namespace_s="",
+                  data_s="",
+                  name_s="Matchability")
+        sizes = _get_tensor_sizes(input)
+        if sizes is not None and sizes[1] is not None:
+            N, C, H, W = sizes
+            out_size = [N, 1, H, W]
+            op.setType(input.type().with_sizes(out_size))
+        return op
 
     @staticmethod
     def forward(ctx, input):
