@@ -38,8 +38,12 @@ class StereoDataset(Dataset):
     def __getitem__(self, idx):
         data = {}
 
-        left_image = self.loader_helper.load_image(os.path.join(self.dataset_path, LEFT_DIR, self.images[idx]))
-        right_image = self.loader_helper.load_image(os.path.join(self.dataset_path, RIGHT_DIR, self.images[idx]))
+        left_image = self.loader_helper.load_image(
+            os.path.join(self.dataset_path, LEFT_DIR, self.images[idx]))
+        right_image = self.loader_helper.load_image(
+            os.path.join(self.dataset_path, RIGHT_DIR, self.images[idx]))
+        if left_image is None or right_image is None:
+            print("IMAGE MISSING", self.images[idx])
         height, width, _ = left_image.shape
 
         left_disparity = self.loader_helper.load_npz(os.path.join(self.dataset_path, LEFT_DISPARITY_DIR, self.npz[idx]),

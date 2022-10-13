@@ -4,14 +4,10 @@ import os
 
 import cv2
 import numpy as np
-from turbojpeg import TurboJPEG
 
 
 class LoaderHelper(object):
     """Helper for loading data elements of various file types with optional fallbacks if the file doesn't exist"""
-
-    def __init__(self):
-        self.jpeg = TurboJPEG()
 
     def load_image(self, filename, *, fallback_example=None, fallback_none=False):
         if os.path.exists(filename):

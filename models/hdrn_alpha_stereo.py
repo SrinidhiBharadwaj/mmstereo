@@ -86,7 +86,7 @@ class LeakyPreactBasicResidualBlock(ResidualBlock):
         outputs = self.relu(self.bn1(self.conv1(inputs)))
         outputs = self.conv2(outputs)
 
-        outputs += shortcut_inputs
+        outputs = outputs + shortcut_inputs
 
         if self.bn_last is not None:
             outputs = self.relu(self.bn_last(outputs))
@@ -252,7 +252,7 @@ class HybridDilatedResNetAlphaRefine(nn.Module):
         self.upsample2 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False)
 
         self.conv_out = nn.Conv2d(offset_channels, 1, kernel_size=3, padding=1)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.ReLU(inplace=False)
 
     def forward(self, image, disparity, matchability, cost_volume):
         base_disparity = self.base_upsample(disparity) * self.in_scale
@@ -282,7 +282,7 @@ class HybridDilatedResNetAlphaRefine(nn.Module):
 
         outputs = self.conv_out(torch.cat([base_disparity, self.upsample2(outputs)], dim=1))
 
-        return self.relu(base_disparity + outputs)
+        return self.relu(base_disparity + outputs).clone()
 
 
 def hdrn_alpha_base_refine(num_disparities, in_scale):
