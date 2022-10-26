@@ -55,7 +55,7 @@ def fix_module(module):
 def export_stereo_model(hparams: TrainingConfig, model, filename, height=544, width=960):
     """Create exportable model and write to given filename"""
     model = copy.deepcopy(model).cpu()
-    fix_module(model)
+    # fix_module(model)
     model = ExportableStereo(hparams, model)
 
     dummy_input = (torch.zeros((1, 3, height, width), dtype=torch.float32),
@@ -65,4 +65,4 @@ def export_stereo_model(hparams: TrainingConfig, model, filename, height=544, wi
     output_names = ["disparity", "disparity_small", "matchability"]
 
     torch.onnx.export(model, dummy_input, filename, verbose=False, input_names=input_names, output_names=output_names,
-                      do_constant_folding=True, enable_onnx_checker=True, opset_version=11)
+                      do_constant_folding=True, opset_version=14)

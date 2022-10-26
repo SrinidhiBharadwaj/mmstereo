@@ -3,21 +3,30 @@
 import torch
 import torch.nn as nn
 
-
-@torch.jit.script
-def cost_volume(left, right, num_disparities: int, is_right: bool):
+def cost_volume_left(left, right, num_disparities: int):
     batch_size, channels, height, width = left.shape
 
-    output = torch.zeros((batch_size, channels, num_disparities, height, width), dtype=left.dtype,
-                         device=left.device)
-
+    outputs = []
     for i in range(num_disparities):
-        if not is_right:
-            output[:, :, i, :, i:] = left[:, :, :, i:] * right[:, :, :, :width - i]
-        else:
-            output[:, :, i, :, :width - i] = left[:, :, :, i:] * right[:, :, :, :width - i]
+        cost = left[:, :, :, i:] * right[:, :, :, :width-i]
+        zeros = torch.zeros((batch_size, channels, height, i), dtype=left.dtype, device=left.device)
+        out = torch.cat([zeros, cost], dim=-1)
+        outputs.append(out[:, :, None])
 
-    return output
+    return torch.cat(outputs, dim=2)
+
+
+def cost_volume_right(left, right, num_disparities: int):
+    batch_size, channels, height, width = left.shape
+
+    outputs = []
+    for i in range(num_disparities):
+        zeros = torch.zeros((batch_size, channels, height, i), dtype=left.dtype, device=left.device)
+        cost = left[:, :, :, i:] * right[:, :, :, :width-i]
+        out = torch.cat([cost, zeros], dim=-1)
+        outputs.append(out[:, :, None])
+
+    return torch.cat(outputs, dim=2)
 
 
 class CostVolume(nn.Module):
@@ -29,17 +38,12 @@ class CostVolume(nn.Module):
         self.is_right = is_right
 
     def forward(self, left, right):
-        if torch.jit.is_scripting():
-            return cost_volume(left, right, self.num_disparities, self.is_right)
+        original_dtype = left.dtype
+        left = left.to(torch.float32)
+        right = right.to(torch.float32)
+        if self.is_right:
+            out = cost_volume_right(left, right, self.num_disparities)
         else:
-            return self.forward_with_amp(left, right)
+            out = cost_volume_left(left, right, self.num_disparities)
+        return torch.clamp(out, -1e3, 1e3).to(original_dtype)
 
-    @torch.jit.unused
-    def forward_with_amp(self, left, right):
-        """This operation is unstable at float16, so compute at float32 even when using mixed precision"""
-        with torch.cuda.amp.autocast(enabled=False):
-            left = left.to(torch.float32)
-            right = right.to(torch.float32)
-            output = cost_volume(left, right, self.num_disparities, self.is_right)
-            output = torch.clamp(output, -1e3, 1e3)
-            return output
