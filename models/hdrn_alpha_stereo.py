@@ -103,7 +103,7 @@ class HybridDilatedResNetAlpha(nn.Module):
 
         block_func = PreactBasicResidualBlock
 
-        self.transition1 = TransitionBlock(3, num_channels[0], 2)
+        self.transition1 = TransitionBlock(1, num_channels[0], 2)
 
         self.transition2 = TransitionBlock(num_channels[0], num_channels[0], 2)
         self.group1 = preact_resnet_group(block_func, num_channels[0], num_channels[0], num_blocks[0])
@@ -226,7 +226,7 @@ class HybridDilatedResNetAlphaRefine(nn.Module):
         self.block_merge2 = PreactBasicResidualBlock(num_channels[0] * 2, num_channels[0], stride=1, add_preact=True,
                                                      add_last_norm=True)
 
-        self.transition1 = TransitionBlock(3, num_channels[0], 2)
+        self.transition1 = TransitionBlock(1, num_channels[0], 2)
 
         self.transition2 = TransitionBlock(num_channels[0], num_channels[0], 2)
         self.group1 = preact_resnet_group(block_func, num_channels[0], num_channels[0], num_blocks[0])

@@ -58,8 +58,8 @@ def export_stereo_model(hparams: TrainingConfig, model, filename, height=544, wi
     # fix_module(model)
     model = ExportableStereo(hparams, model)
 
-    dummy_input = (torch.zeros((1, 3, height, width), dtype=torch.float32),
-                   torch.zeros((1, 3, height, width), dtype=torch.float32))
+    dummy_input = (torch.zeros((1, 1, height, width), dtype=torch.float32),
+                   torch.zeros((1, 1, height, width), dtype=torch.float32))
 
     input_names = ["left_input", "right_input"]
     output_names = ["disparity", "disparity_small", "matchability"]
