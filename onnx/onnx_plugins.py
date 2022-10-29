@@ -7,51 +7,12 @@ import struct
 import torch
 import torch.nn as nn
 
-from layers.cost_volume import cost_volume
 from layers.matchability import matchability
 from layers.soft_argmin import soft_argmin
 from torch.onnx.symbolic_helper import _get_tensor_sizes
 
 
-@torch.autograd.function.traceable
-class ExportableCostVolumeFunction(torch.autograd.Function):
 
-    @staticmethod
-    def symbolic(g, left, right, num_disparities, is_right):
-        assert not is_right
-        serialized_data = struct.pack("<iiiii", num_disparities, 0, 0, 0, 0)
-        op = g.op("mmstereo::CostVolume",
-                  left,
-                  right,
-                  version_s="0.0.1",
-                  namespace_s="",
-                  data_s=serialized_data,
-                  name_s="CrossCorrelationCostVolume")
-
-        sizes = _get_tensor_sizes(left)
-        if sizes is not None and sizes[1] is not None:
-            N, C, H, W = sizes
-            out_type = left.type().with_sizes([N, C, num_disparities, H, W])
-            op.setType(out_type)
-
-        return op
-
-    @staticmethod
-    def forward(ctx, left, right, num_disparities, is_right):
-        return cost_volume(left, right, num_disparities, is_right)
-
-
-class ExportableCostVolume(nn.Module):
-
-    def __init__(self, num_disparities, is_right):
-        super().__init__()
-        self.num_disparities = num_disparities
-        self.is_right = is_right
-
-    def forward(self, left, right):
-        return ExportableCostVolumeFunction.apply(left, right,
-                                                  self.num_disparities,
-                                                  self.is_right)
 
 
 @torch.autograd.function.traceable

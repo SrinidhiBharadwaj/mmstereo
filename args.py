@@ -23,6 +23,9 @@ class DatasetConfig(object):
 
 @dataclass
 class TransformConfig(object):
+    """Resize images"""
+    resize: Optional[List[int]] = None
+
     """Random crop images, individual arguments are height and width"""
     random_crop: Optional[List[int]] = None
 
@@ -31,6 +34,7 @@ class TransformConfig(object):
 
     """Random augmentation of image hue, saturation, gamma, intensity"""
     random_color_jitter: bool = False
+
 
     """Keep uncorrupted RGB images"""
     keep_uncorrupted: bool = False

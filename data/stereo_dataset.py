@@ -14,7 +14,6 @@ RIGHT_DIR = "right"
 LEFT_DISPARITY_DIR = "left_disparity"
 RIGHT_DISPARITY_DIR = "right_disparity"
 
-
 class StereoDataset(Dataset):
 
     def __init__(self, idx, dataset_path, sim, transform=None):

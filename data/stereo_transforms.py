@@ -5,11 +5,43 @@ import random
 import warnings
 
 import numpy as np
+import cv2
 from PIL import Image
 import torch
 import torchvision
 
 from data.sample import ElementKeys, ElementType
+
+class Resize(object):
+    """Resizes image"""
+
+    def __init__(self, size, generator):
+        assert len(size) == 2
+        self.size = size
+
+    def __call__(self, sample):
+        left_rgb = sample.get_data(ElementKeys.LEFT_RGB)
+        right_rgb = sample.get_data(ElementKeys.RIGHT_RGB)
+        left_disparity = sample.get_data(ElementKeys.LEFT_DISPARITY)
+        right_disparity = sample.get_data(ElementKeys.RIGHT_DISPARITY)
+        image_width = left_rgb.shape[1]
+        image_height = left_rgb.shape[0]
+        assert (image_width >= self.size[0] and
+                image_height >= self.size[1])
+
+        left_rgb = cv2.resize(left_rgb, self.size)
+        right_rgb = cv2.resize(right_rgb, self.size)
+
+        scale_x = self.size[0] / image_width
+        left_disparity = cv2.resize(left_disparity, self.size, cv2.INTER_NEAREST) * scale_x
+        right_disparity = cv2.resize(right_disparity, self.size, cv2.INTER_NEAREST) * scale_x
+
+        sample.set_data(ElementKeys.LEFT_RGB, left_rgb)
+        sample.set_data(ElementKeys.LEFT_DISPARITY, left_disparity)
+        sample.set_data(ElementKeys.RIGHT_RGB, right_rgb)
+        sample.set_data(ElementKeys.RIGHT_DISPARITY, right_disparity)
+
+        return sample
 
 
 class RandomCrop(object):

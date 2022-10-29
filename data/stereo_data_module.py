@@ -11,7 +11,7 @@ from args import DataConfig, StageConfig, TransformConfig
 from data.sample import collate
 from data.stereo_dataset import StereoDataset
 from data.stereo_transforms import RandomCrop, RandomHorizontalFlip, RandomColorJitter, NormalizeImage, ToTensor, \
-    Compose, KeepUncorrupted
+    Compose, KeepUncorrupted, Resize
 
 
 class StereoDataModule(pl.LightningDataModule):
@@ -79,6 +79,10 @@ class StereoDataModule(pl.LightningDataModule):
         if config.random_crop is not None:
             generator, seed = self._get_generator(seed)
             transform_list.append(RandomCrop(config.random_crop, generator))
+
+        if config.resize is not None:
+            generator, seed = self._get_generator(seed)
+            transform_list.append(Resize(config.resize, generator))
 
         if config.random_horizontal_flip:
             generator, seed = self._get_generator(seed)
