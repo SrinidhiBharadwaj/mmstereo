@@ -158,8 +158,17 @@ def log_images(all_loggers, hparams: TrainingConfig, step, prefix, batch, all_ou
 
     logger = get_tensorboard(all_loggers).experiment
 
-    logger.add_image("{}/input_left".format(prefix), make_bgr_image(batch_data[ElementKeys.LEFT_RGB]), step)
-    logger.add_image("{}/input_right".format(prefix), make_bgr_image(batch_data[ElementKeys.RIGHT_RGB]), step)
+    left_rgb = batch_data[ElementKeys.LEFT_RGB]
+    right_rgb = batch_data[ElementKeys.RIGHT_RGB]
+    if left_rgb.shape[1] == 3:
+        left_rgb = make_bgr_image(left_rgb)
+        right_rgb = make_bgr_image(right_rgb)
+    else:
+        left_rgb = left_rgb[0]
+        right_rgb = right_rgb[0]
+
+    logger.add_image("{}/input_left".format(prefix), left_rgb, step)
+    logger.add_image("{}/input_right".format(prefix), right_rgb, step)
 
     for idx, (output_name, output) in enumerate(all_outputs.items()):
         right = output.get("right", False)

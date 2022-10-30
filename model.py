@@ -46,8 +46,8 @@ class StereoModel(pl.LightningModule):
     def forward(self, batch):
         # Extract inputs from batch and run forward pass.
         batch_metadata, batch_data = batch
-        left_image = batch_data[ElementKeys.LEFT_RGB].mean(dim=1, keepdim=True)
-        right_image = batch_data[ElementKeys.RIGHT_RGB].mean(dim=1, keepdim=True)
+        left_image = batch_data[ElementKeys.LEFT_RGB]
+        right_image = batch_data[ElementKeys.RIGHT_RGB]
         output, all_outputs = self.model(left_image, right_image)
         return output, all_outputs
 

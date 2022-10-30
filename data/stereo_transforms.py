@@ -43,6 +43,26 @@ class Resize(object):
 
         return sample
 
+class Grayscale:
+    def __init__(self, randomize):
+        self.randomize = True
+        self.equal = np.ones(3) / 3.
+
+    def __call__(self, sample):
+        left_rgb = sample.get_data(ElementKeys.LEFT_RGB)
+        right_rgb = sample.get_data(ElementKeys.RIGHT_RGB)
+        if self.randomize:
+            weights = np.random.uniform(0.2, 0.8, 3)
+            weights /= weights.sum()
+        else:
+            weights = equal
+        assert left_rgb.shape[-1] == 3
+        left_rgb = (left_rgb * weights).sum(axis=2)[:, :, None]
+        right_rgb = (right_rgb * weights).sum(axis=2)[:, :, None]
+        sample.set_data(ElementKeys.LEFT_RGB, left_rgb)
+        sample.set_data(ElementKeys.RIGHT_RGB, right_rgb)
+        return sample
+
 
 class RandomCrop(object):
     """Random crop with random vertical shift for right image"""
@@ -165,7 +185,7 @@ class NormalizeImage(object):
     def __init__(self, normalization_param):
         self.mean = np.array(normalization_param['mean'], dtype=np.float32)
         self.scale = np.array(normalization_param['scale'],
-                              dtype=np.float32).reshape((1, 1, 3))
+                              dtype=np.float32).reshape((1, 1, len(normalization_param['scale'])))
 
     def __call__(self, sample):
         for key, element in sample.elements.items():

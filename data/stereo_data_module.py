@@ -11,7 +11,7 @@ from args import DataConfig, StageConfig, TransformConfig
 from data.sample import collate
 from data.stereo_dataset import StereoDataset
 from data.stereo_transforms import RandomCrop, RandomHorizontalFlip, RandomColorJitter, NormalizeImage, ToTensor, \
-    Compose, KeepUncorrupted, Resize
+    Compose, KeepUncorrupted, Resize, Grayscale
 
 
 class StereoDataModule(pl.LightningDataModule):
@@ -95,9 +95,14 @@ class StereoDataModule(pl.LightningDataModule):
             generator, seed = self._get_generator(seed)
             transform_list.append(RandomColorJitter(generator))
 
-        # All samples require normalization and conversion to tensor as the last operation.
-        mean = [0.0, 0.0, 0.0]
-        scale = [1.0 / 255.0, 1.0 / 255.0, 1.0 / 255.0]
+        if config.grayscale is not None:
+            transform_list.append(Grayscale(config.grayscale))
+            mean = [0.0]
+            scale = [1.0 / 255.0]
+        else:
+            # All samples require normalization and conversion to tensor as the last operation.
+            mean = [0.0, 0.0, 0.0]
+            scale = [1.0 / 255.0, 1.0 / 255.0, 1.0 / 255.0]
         transform_list.append(NormalizeImage({'mean': mean, 'scale': scale}))
         transform_list.append(ToTensor())
 
