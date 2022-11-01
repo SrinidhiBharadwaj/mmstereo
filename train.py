@@ -73,7 +73,7 @@ if __name__ == "__main__":
         gpus = [0]
         accelerator = None
 
-    log_every_n_steps = 50
+    log_every_n_steps = 250
 
     trainer = pl.Trainer(callbacks=callbacks,
                          logger=loggers,
