@@ -1,11 +1,21 @@
 data:
   train:
     datasets:
-      - path: datasets/sceneflow/flying_things/train
+      - path: FlyingThings/data/train
         sim: true
         no_split: true
+      - path: middlebury/data/train
+        sim: false
+        no_split: true
+        repeats: 500
+      - path: eth3d/data/train
+        sim: true
+        no_split: true
+        repeats: 500
     transform:
-      random_crop: [ 896, 480 ]
+      grayscale: true
+      random_resize: [0.5, 1.5]
+      random_crop: [ 640, 400 ]
       random_horizontal_flip: true
       random_color_jitter: true
       keep_uncorrupted: true
@@ -14,16 +24,19 @@ data:
     num_workers: 8
   val:
     datasets:
-      - path: datasets/sceneflow/flying_things/val
+      - path: middlebury/data/val
         sim: true
         no_split: true
     batch_size: 1
     num_workers: 4
+    transform:
+      grayscale: false
+      resize: [ 640, 400 ]
 
 model:
   model_file: models/hdrn_alpha_stereo.py
   model_name: hdrn_alpha_stereo
-  num_disparities: 256
+  num_disparities: 128
   downsample_factor: 4
   fe_internal_features: 16
 
@@ -40,7 +53,7 @@ optimizer:
   lr_policy: poly
   poly_exp: 0.9
 
-epochs: 20
+epochs: 100
 output: output
 use_amp: true
 export_torchscript: true

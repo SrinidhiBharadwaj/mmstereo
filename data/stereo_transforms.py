@@ -64,6 +64,34 @@ class Grayscale:
         return sample
 
 
+class RandomResize(object):
+    def __init__(self, resize_range, generator):
+        self.resize_range = resize_range
+        self.random_scale = resize_range[1] - resize_range[0]
+        self.generator = generator
+        self.min_size = (700, 500)
+
+    def __call__(self, sample):
+        scale_factor = self.resize_range[0] + self.random_scale * self.generator.random()
+        left_rgb = sample.get_data(ElementKeys.LEFT_RGB)
+        right_rgb = sample.get_data(ElementKeys.RIGHT_RGB)
+        left_disp = sample.get_data(ElementKeys.LEFT_DISPARITY)
+        right_disp = sample.get_data(ElementKeys.RIGHT_DISPARITY)
+        height, width = left_rgb.shape[:2]
+        new_size = (max(int(scale_factor * width), self.min_size[0]),
+                    max(int(scale_factor * height), self.min_size[1]))
+        actual_scale_factor = new_size[0] / width
+        left_rgb = cv2.resize(left_rgb, new_size)
+        right_rgb = cv2.resize(right_rgb, new_size)
+        left_disp = cv2.resize(left_disp, new_size, cv2.INTER_NEAREST) * actual_scale_factor
+        if right_disp is not None:
+            right_disp = cv2.resize(right_disp, new_size, cv2.INTER_NEAREST) * actual_scale_factor
+            sample.set_data(ElementKeys.RIGHT_DISPARITY, right_disp)
+        sample.set_data(ElementKeys.LEFT_RGB, left_rgb)
+        sample.set_data(ElementKeys.RIGHT_RGB, right_rgb)
+        sample.set_data(ElementKeys.LEFT_DISPARITY, left_disp)
+        return sample
+
 class RandomCrop(object):
     """Random crop with random vertical shift for right image"""
 

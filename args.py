@@ -29,6 +29,9 @@ class TransformConfig(object):
     """Convert images to grayscale, randomized or not."""
     grayscale: Optional[bool] = True
 
+    """Randomly resize image up or down in given relative range."""
+    random_resize: Optional[List[float]] = None
+
     """Random crop images, individual arguments are height and width"""
     random_crop: Optional[List[int]] = None
 
