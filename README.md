@@ -13,23 +13,23 @@ Krishna Shankar, Mark Tjersland, Jeremy Ma, Kevin Stone, and Max Bajracharya. A 
 sudo apt install libturbojpeg virtualenv python3.8
 ```
 
-### Python virtual environment
-`virtualenv` lets you install Python packages without conflicting with other workspaces.
+### Anaconda environment
+`conda` lets you install Python packages without conflicting with other workspaces.
 
 #### Create the virtual environment
 ```
-virtualenv -p python3.8 venv
+conda create -n mmstereo Python=3.8
 ```
 
 #### Activate the virtual environment
 ```
-source venv/bin/activate
+conda activate mmstereo
 ```
 Make sure you activate it each time you use the training code.
 
 ### Install PyTorch
 ```
-pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.3 -c pytorch
 ```
 
 ### Install other dependencies
