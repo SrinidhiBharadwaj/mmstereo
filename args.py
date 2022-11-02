@@ -72,8 +72,11 @@ class ModelConfig(object):
 
     fe_features: int = 16
     fe_internal_features: int = 32
+    fe_dilations: List[int] = field(default_factory=lambda: [1, 2, 5, 9])
+    fe_num_blocks: List[int] = field(default_factory=lambda: [3, 4, 8])
     num_disparities: int = 256
     downsample_factor: int = 8
+
 
     checkpoint: Optional[str] = None
 

@@ -127,10 +127,10 @@ class HybridDilatedResNetAlpha(nn.Module):
         return group1_outputs, group2_outputs, group3_outputs
 
 
-def hdrn_alpha_base(num_channels):
-    return HybridDilatedResNetAlpha(num_blocks=[3, 4, 8],
+def hdrn_alpha_base(num_channels, num_blocks, dilations):
+    return HybridDilatedResNetAlpha(num_blocks=num_blocks,
                                     num_channels=[num_channels, num_channels * 2, num_channels * 4],
-                                    dilation_rates=[1, 2, 5, 9])
+                                    dilation_rates=dilations)
 
 
 class ScoreFeatures(nn.Module):
@@ -355,7 +355,7 @@ class HdrnAlphaStereo(nn.Module):
         self.max_disparity_small = self.internal_num_disparities - 1
         self.max_disparity = self.max_disparity_small * self.internal_scale - 1
 
-        self.features = hdrn_alpha_base(hparams.fe_internal_features)
+        self.features = hdrn_alpha_base(hparams.fe_internal_features, hparams.fe_num_blocks, hparams.fe_dilations)
         self.score_features = ScoreFeatures(hparams.fe_internal_features, hparams.fe_features, self.internal_scale)
 
         self.cost_volume = CostVolume(self.internal_num_disparities)
