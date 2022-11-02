@@ -98,3 +98,21 @@ Example structure:
 * right
   * sample0.png
   * sample1.png
+
+
+# Running on OAK-D device
+
+The learned model can be exported to run on an OAK-D device. After training a model, run:
+```
+./compile_model.sh <path-to-onnx-file>
+```
+where `<path-to-onnx-file>` is the path to the `model.onnx` file in the training checkpoint directory, e.g. `output/sceneflow/version_0/checkpoints/model.onnx`.
+
+The `compile_model.sh` script uses an Intel Openvino [Docker](https://docs.docker.com/engine/install/ubuntu/) image to compile the model for the Myriad processor, so make sure you have docker installed and running.
+
+The script produces a `model.blob` blob file, that can be loaded by the depthai library.
+
+With your device connected, you can test it with `python depthai_test.py`.
+
+
+
