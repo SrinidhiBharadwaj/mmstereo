@@ -3,6 +3,7 @@ import os
 import shutil
 import re
 from tqdm import tqdm
+from prepare_sceneflow import readPFM
 
 import cv2
 import numpy as np
@@ -26,38 +27,9 @@ def filename(left_rgb_path):
     return parts[-2]
 
 
-def read_pfm(file):
-    with open(file, "rb") as f:
-        type = f.readline().decode('latin-1')
-        if "PF" in type:
-            channels = 3
-        elif "Pf" in type:
-            channels = 1
-        else:
-            sys.exit(1)
-        line = f.readline().decode('latin-1')
-        width, height = re.findall('\d+', line)
-        width = int(width)
-        height = int(height)
-
-        line = f.readline().decode('latin-1')
-        BigEndian = True
-        if "-" in line:
-            BigEndian = False
-        samples = width * height * channels;
-        buffer = f.read(samples * 4)
-        if BigEndian:
-            fmt = ">"
-        else:
-            fmt = "<"
-        fmt = fmt + str(samples) + "f"
-        disparity = np.frombuffer(buffer, fmt)
-    disparity = disparity.reshape(height, width).copy()
-    return np.flipud(disparity)
-
 def read_disparity(filepath):
-    disp = read_pfm(filepath)
-    disp[np.isinf(disp)] = -1.0
+    disp, _ = readPFM(filepath)
+    disp[np.isinf(disp)] = 0.0
     return disp
 
 
