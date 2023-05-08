@@ -1,17 +1,9 @@
 data:
   train:
     datasets:
-      - path: FlyingThings/data/train
-        sim: true
-        no_split: true
-      - path: middlebury/data/train
+      - path: /home/srinidhi/Desktop/hackathon/mmstereo/datasets/sceneflow/prepared/train
         sim: false
         no_split: true
-        repeats: 500
-      - path: eth3d/data/train
-        sim: true
-        no_split: true
-        repeats: 500
     transform:
       grayscale: true
       random_resize: [0.5, 1.5]
@@ -24,8 +16,8 @@ data:
     num_workers: 8
   val:
     datasets:
-      - path: middlebury/data/val
-        sim: true
+      - path: /home/srinidhi/Desktop/hackathon/mmstereo/datasets/sceneflow/prepared/val
+        sim: false
         no_split: true
     batch_size: 1
     num_workers: 4
@@ -53,7 +45,7 @@ optimizer:
   lr_policy: poly
   poly_exp: 0.9
 
-epochs: 100
+epochs: 2
 output: output
 use_amp: true
 export_torchscript: true
