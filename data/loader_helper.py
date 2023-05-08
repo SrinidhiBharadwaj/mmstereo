@@ -16,7 +16,7 @@ class LoaderHelper(object):
                 with open(filename, "rb") as jpeg_file:
                     return self.jpeg.decode(jpeg_file.read())
             else:
-                return cv2.imread(filename, cv2.IMREAD_UNCHANGED)
+                return cv2.imread(filename)
         else:
             if fallback_example is not None:
                 return np.zeros_like(fallback_example)
