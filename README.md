@@ -14,6 +14,7 @@ Please note that the code base is super sensitive to package versions and I have
     ```https://github.com/SrinidhiBharadwaj/mmstereo.git```
 - Create a conda enviroment
     ``` conda create -n hackathon python=3.8```
+    
     ```conda activate hackathon```
 - Install pytorch in the conda enviroment
     ``` conda install pytorch=1.13.1 torchvision=0.14.1 torchaudio=0.13.1 pytorch-cuda=11.6 -c pytorch -c nvidia```
@@ -26,6 +27,7 @@ Please note that the code base is super sensitive to package versions and I have
 
 Follow the instructions mentioned here:
 ```https://github.com/luxonis/depthai```
+
  They have got some really cool examples, feel free to play around
  
 
