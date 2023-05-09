@@ -6,98 +6,28 @@ Learned stereo training code for the paper:
 Krishna Shankar, Mark Tjersland, Jeremy Ma, Kevin Stone, and Max Bajracharya. A Learned Stereo Depth System for Robotic Manipulation in Homes. ICRA 2022 submission.
 ```
 
-## Setup
+Please note that the code base is super sensitive to package versions and I haven't ironed out all the kinks yet!
 
-### Install apt dependencies
-```
-sudo apt install libturbojpeg virtualenv python3.8
-```
+## Environment setup steps:
 
-### Anaconda environment
-`conda` lets you install Python packages without conflicting with other workspaces.
+- Clone the repo:
+    ```https://github.com/SrinidhiBharadwaj/mmstereo.git```
+- Create a conda enviroment
+    ``` conda create -n hackathon python=3.8```
+    ```conda activate hackathon```
+- Install pytorch in the conda enviroment
+    ``` conda install pytorch=1.13.1 torchvision=0.14.1 torchaudio=0.13.1 pytorch-cuda=11.6 -c pytorch -c nvidia```
+- Install requirements from requirements.txt
+    - Note: I have removed specific versions from the original repo due to version conflicts
+- Run ```python3 train.py --config config_scenes.yaml``` to start the training process
+- Feel free to tune the hyperparameters in *config_scenes.yaml* file to get better (or worse :P) results.
 
-#### Create the virtual environment
-```
-conda create -n mmstereo Python=3.8
-```
+### Depth AI SDK setup for OAK-D cameras
 
-#### Activate the virtual environment
-```
-conda activate mmstereo
-```
-Make sure you activate it each time you use the training code.
-
-### Install PyTorch
-```
-conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.3 -c pytorch
-```
-
-### Install other dependencies
-```
-pip install -r requirements.txt
-```
-
-## Sceneflow Dataset Training
-
-### Get dataset
-Download RGB and disparity images for Sceneflow Flying Things dataset from https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html.
-
-Extract the downloaded files to `datasets/sceneflow/raw`.
-
-
-### Prepare dataset
-The dataset needs to be converted into a format that is compatible with the training code.
-
-```
-python prepare_sceneflow.py
-```
-
-### Train
-The configuration is set up to work with a Titan RTX GPU with 24GB of VRAM. For other GPUs with less VRAM, you may need to reduce the batch size.
-```
-python train.py --config config_sceneflow.yaml
-```
-
-### Visualize with tensorboard
-In a new terminal (since your other terminal is running the training script),
-```
-source venv/bin/activate
-tensorboard --logdir output
-```
-and then open the url it gives you in a browser.
-
-# Inference
-You can run inference on a pair of images using the Torchscript output from training.
-```
-python run.py --script output/sceneflow/version_0/checkpoints/model.pt --left datasets/sceneflow/flying_things/val/left/0000000.png --right datasets/sceneflow/flying_things/val/right/0000000.png
-```
-
-# Dataset
-Each sample is dataset is made up of a pair of left and right RGB images, a left disparity image, and an optional right
-disparity image.
-
-## RGB images
-The RGB images should be 3-channel 8-bit images as either JPG or PNG format.
-
-## Disparity images
-The disparity images should a floating point Numpy ndarray stored in NPZ format with the same height and width as the
-RGB images. If there is no right disparity, training is possible but the horizontal flip data augmentation can't be
-used.
-
-## Directory structure
-The each element of a sample should be stored in a certain directory with the same base filename and appropriate
-extension.
-
-Example structure:
-* left
-  * sample0.png
-  * sample1.png
-* left_disparity
-  * sample0.npz
-  * sample1.npz
-* right
-  * sample0.png
-  * sample1.png
+Follow the instructions mentioned here:
+```https://github.com/luxonis/depthai```
+ They have got some really cool examples, feel free to play around
+ 
 
 
 # Running on OAK-D device
