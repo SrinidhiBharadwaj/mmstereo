@@ -1,7 +1,6 @@
 import os
 import cv2
 import numpy as np
-from depthai_sdk import FPSHandler
 import argparse
 import depthai as dai
 
@@ -44,8 +43,6 @@ def main():
     nn_xout.setStreamName('disparity')
     nn.out.link(nn_xout.input)
 
-    fps_handler = FPSHandler()
-
     with dai.Device(pipeline) as device:
         device.setLogLevel(dai.LogLevel.INFO)
         queue_nn = device.getOutputQueue(name="disparity", maxSize=1, blocking=False)
@@ -65,7 +62,6 @@ def main():
 
             disparity_vis = cv2.applyColorMap(nn_disp, cv2.COLORMAP_INFERNO)
 
-            fps_handler.drawFps(disparity_vis, 'disparity')
             cv2.imshow("Disparity", disparity_vis)
 
             if cv2.waitKey(1) == ord('q'):
