@@ -52,7 +52,6 @@ def main():
         scale_multiplier = TARGET_SHAPE[1] / NN_INPUT_SHAPE[1]
 
         while True:
-            fps_handler.tick('disparity')
 
             nn_msg = queue_nn.get()
 
